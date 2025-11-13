@@ -1,0 +1,24 @@
+app = "grafana-app" # ganti sesuai nama app lu
+
+[build]
+image = "grafana/grafana:latest"
+
+[env]
+GF_SECURITY_ADMIN_USER = "admin"
+GF_SECURITY_ADMIN_PASSWORD = "admin"
+
+[processes]
+app = "/run.sh"
+
+[[services]]
+internal_port = 3000
+processes = ["app"]
+protocol = "tcp"
+
+[[services.ports]]
+handlers = ["http"]
+port = 80
+
+[[services.ports]]
+handlers = ["tls", "http"]
+port = 443
