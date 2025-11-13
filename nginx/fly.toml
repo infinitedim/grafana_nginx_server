@@ -1,10 +1,10 @@
-app = "nginx-grafana-infinitedim" # ganti sesuai nama app di fly
+app = "grafana_nginx_server"
 kill_signal = "SIGINT"
 kill_timeout = 5
 
 [build]
 dockerfile = "Dockerfile"
-image = "registry.fly.io/nginx-grafana-infinitedim:latest" # optional
+image = "registry.fly.io/grafana_nginx_server:latest"
 
 [[services]]
 internal_port = 80
