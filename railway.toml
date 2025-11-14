@@ -1,0 +1,40 @@
+[build]
+builder = "DOCKERFILE"
+
+[deploy]
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
+
+# Service: Grafana
+[[services]]
+name = "grafana"
+source = "grafana"
+
+[services.build]
+dockerfilePath = "Dockerfile"
+dockerContext = "."
+
+[services.deploy]
+startCommand = "grafana-server --homepath=/usr/share/grafana --config=/etc/grafana/grafana.ini"
+
+[[services.ports]]
+port = 3000
+
+# Service: Nginx
+[[services]]
+name = "nginx"
+source = "nginx"
+
+[services.build]
+dockerfilePath = "Dockerfile"
+dockerContext = "."
+
+[services.deploy]
+startCommand = "nginx -g 'daemon off;'"
+
+[[services.ports]]
+port = 80
+
+[services.env]
+GRAFANA_HOST = "grafana.railway.internal"
+GRAFANA_PORT = "3000"
