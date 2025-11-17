@@ -1,0 +1,72 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=grafana
+      - POSTGRES_USER=grafana
+      - POSTGRES_PASSWORD=grafana_password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U grafana -d grafana"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - grafana-network
+
+  grafana:
+    build:
+      context: ./grafana
+      dockerfile: Dockerfile
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "4000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/grafana.ini:/etc/grafana/grafana.ini:ro
+    environment:
+      - GF_SERVER_ROOT_URL=http://localhost:4000
+      - GF_SERVER_SERVE_FROM_SUB_PATH=false
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_DATABASE_TYPE=postgres
+      - GF_DATABASE_HOST=postgres:5432
+      - GF_DATABASE_NAME=grafana
+      - GF_DATABASE_USER=grafana
+      - GF_DATABASE_PASSWORD=grafana_password
+      - GF_DATABASE_SSL_MODE=disable
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - grafana-network
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - grafana
+    environment:
+      - GRAFANA_HOST=grafana
+      - GRAFANA_PORT=4000
+    networks:
+      - grafana-network
+
+volumes:
+  grafana-data:
+  postgres-data:
+
+networks:
+  grafana-network:
+    driver: bridge
