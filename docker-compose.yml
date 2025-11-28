@@ -26,12 +26,12 @@ services:
     container_name: grafana
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "4000:3000"
     volumes:
       - grafana-data:/var/lib/grafana
       - ./grafana/grafana.ini:/etc/grafana/grafana.ini:ro
     environment:
-      - GF_SERVER_ROOT_URL=http://localhost:3000
+      - GF_SERVER_ROOT_URL=http://localhost:4000
       - GF_SERVER_SERVE_FROM_SUB_PATH=false
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
@@ -59,7 +59,7 @@ services:
       - grafana
     environment:
       - GRAFANA_HOST=grafana
-      - GRAFANA_PORT=3000
+      - GRAFANA_PORT=4000
     networks:
       - grafana-network
 
